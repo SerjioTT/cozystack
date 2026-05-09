@@ -1,0 +1,229 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "ResourceQuota utilisation per tenant namespace — used as % of hard limit, hard limit shown as absolute value in legend",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "% of hard limit",
+            "axisPlacement": "auto",
+            "axisSoftMax": 110,
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "gradientMode": "opacity",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 75
+              },
+              {
+                "color": "orange",
+                "value": 90
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "B"
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": true,
+                  "viz": true
+                }
+              },
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "dash": [8, 8],
+                  "fill": "dash"
+                }
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 0
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [
+            "last",
+            "max"
+          ],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "repeat": "namespace",
+      "repeatDirection": "v",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "kube_resourcequota{namespace=\"$namespace\", type=\"used\"}\n  / on(namespace, resource, quota)\nkube_resourcequota{namespace=\"$namespace\", type=\"hard\"}\n* 100",
+          "instant": false,
+          "legendFormat": "{{resource}}",
+          "range": true,
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "editorMode": "code",
+          "expr": "kube_resourcequota{namespace=\"$namespace\", type=\"hard\"}",
+          "instant": false,
+          "legendFormat": "{{resource}} (hard limit)",
+          "range": true,
+          "refId": "B"
+        }
+      ],
+      "title": "$namespace",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": [
+    "tenants",
+    "resourcequota"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "hide": 2,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": ["All"],
+          "value": ["$__all"]
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${datasource}"
+        },
+        "definition": "label_values(kube_resourcequota{namespace=~\"tenant-.*\"}, namespace)",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Namespace",
+        "multi": true,
+        "name": "namespace",
+        "options": [],
+        "query": {
+          "query": "label_values(kube_resourcequota{namespace=~\"tenant-.*\"}, namespace)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-3h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Tenant ResourceQuota Usage",
+  "uid": "tenant-resourcequota",
+  "version": 1,
+  "weekStart": ""
+}
